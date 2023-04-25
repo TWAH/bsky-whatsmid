@@ -12,7 +12,7 @@ Anyway, code might be trash, it might be bullet proof, use it at your own risk e
 
 ## System requirements
 - Node
-- ts-node installed globally: `npm install -g ts-node` (unless you want run it another way, but it's written in ts)
+- ts-node installed globally: `npm install -g ts-node` (I'd actually advise compiling to js and running with pm2 but this works for testing)
 
 ## Setup
 - Create a .env file in the root of the project.  Provide the following:
@@ -25,6 +25,7 @@ BSKY_PASSWORD="YOUR BSKY BOT PASSWORD - USE AN APP PASSWORD"
 - Run `npm install`
 
 ## To run
+
 
 `ts-node src/index.ts`
 

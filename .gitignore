@@ -148,3 +148,4 @@ dist
 store/following.json
 store/reposted.json
 .DS_Store
+secret/
