@@ -1,0 +1,17 @@
+{
+  "name": "bsky-whatsmid",
+  "version": "0.0.1",
+  "description": "A bsky bot",
+  "main": "dist/index.js",
+  "scripts": {},
+  "author": "TWAH",
+  "license": "MIT",
+  "dependencies": {
+    "@atproto/api": "^0.2.9",
+    "dotenv": "^16.0.3",
+    "languagedetect": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^18.16.0"
+  }
+}
