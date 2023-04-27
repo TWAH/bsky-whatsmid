@@ -218,7 +218,7 @@ const checkPosts = async (lastCursor?: string) => {
 		return;
 	}
 	// If last post is too old, return
-	if (rootLevel.length > 0 && !postIsRecent(rootLevel[posts.length - 1])) {
+	if (rootLevel.length > 0 && !postIsRecent(rootLevel[rootLevel.length - 1])) {
 		return;
 	}
 
