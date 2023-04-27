@@ -96,6 +96,7 @@ const getFollowing = async (lastCursor?: string) => {
 
 let lastSeenDid: string | undefined;
 const followBack = async (lastCursor?: string) => {
+	console.log('Running followBack...');
 	let params: GetFollowParams = { actor: agent.session?.did || '', limit: GET_FOLLOWER_LIMIT };
 	if (lastCursor) {
 		params = { ...params, cursor: lastCursor };
@@ -189,6 +190,7 @@ const postMeetsCriteria = (post: FeedViewPost): boolean => {
 };
 
 const checkPosts = async (lastCursor?: string) => {
+	console.log('Running checkPosts...');
 	let params: { limit: number; cursor?: string } = { limit: GET_POST_LIMIT_LIMIT };
 	if (lastCursor) {
 		params = { ...params, cursor: lastCursor };
@@ -219,12 +221,82 @@ const checkPosts = async (lastCursor?: string) => {
 	await checkPosts(cursor);
 };
 
+// Used intermittently to check if we've been unfollowed
+const getAllFollowers = async (lastCursor?: string): Promise<string[]> => {
+	let result: string[] = [];
+	let params: GetFollowParams = { actor: agent.session?.did || '', limit: GET_FOLLOWER_LIMIT };
+	if (lastCursor) {
+		params = { ...params, cursor: lastCursor };
+	}
+	let {
+		data: { cursor, followers },
+	} = await agent.getFollowers(params);
+	const followerCids = followers.map((f) => f.did);
+
+	result.push(...followerCids);
+	if (cursor) {
+		const nextPage = await getAllFollowers(cursor);
+		result.push(...nextPage);
+	}
+	return result;
+};
+
+// Used intermittently to check if we've been unfollowed
+const getAllFollowing = async (lastCursor?: string): Promise<{did: string, uri: string}[]> => {
+	let result: {did: string, uri: string}[] = [];
+	let params: GetFollowParams = { actor: agent.session?.did || '', limit: GET_FOLLOWING_LIMIT };
+	if (lastCursor) {
+		params = { ...params, cursor: lastCursor };
+	}
+	let {
+		data: { cursor, follows },
+	} = await agent.getFollows(params);
+	const followerCids = follows.map((f) => ({did: f.did, uri: f.viewer?.following ?? ''}));
+
+	result.push(...followerCids);
+	if (cursor) {
+		const nextPage = await getAllFollowing(cursor);
+		result.push(...nextPage);
+	}
+	return result;
+};
+
+const unfollow = async () => {
+	console.log('Running unfollow...');
+	const followers = await getAllFollowers();
+	const allFollowing = await getAllFollowing();
+	const unfollowed = allFollowing.filter((f) => !followers.includes(f.did));
+
+	let unfollowOps: Promise<any>[] = [];
+	for (let i = 0; i < unfollowed.length; i++) {
+		const user = unfollowed[i];
+		console.log('UNFOLLOWING... ', user.uri);
+		const unfollow = agent.deleteFollow(user.uri);
+		unfollowOps.push(unfollow);
+	}
+
+	await Promise.all(unfollowOps);
+
+	console.log('UNFOLLOWED: ', unfollowed.length);
+	following = allFollowing.filter((f) => !unfollowed.map((uf) => uf.did).includes(f.did)).map(f => f.did);
+	console.log('FOLLOWING: ', following.length);
+	writeFollowing();
+};
+
+let runCount = 0;
 const run = async () => {
+	runCount++;
+	console.log('=====================');
 	console.log('Running...');
 	await followBack();
 	writeFollowing();
 	await checkPosts();
 	writeReposted();
+	//Only check for unfollows every 5 runs
+	if (runCount % 5 === 0) {
+		await unfollow();
+	}
+	console.log('=====================');
 	setTimeout(run, DELAY_MILISECONDS);
 };
 
