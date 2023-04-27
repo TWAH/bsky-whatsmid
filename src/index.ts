@@ -15,8 +15,6 @@ const agent = new BskyAgent({
 
 //#region Setup
 
-/** Max number of errors before it gives up. There's no reset. I just dont want to keep hitting the server if somethings wrong. */
-const MAX_ERRORS = 5;
 /** Delay between each run. The timer starts from the end of the last run. */
 const DELAY_SECONDS = 30;
 const DELAY_MILISECONDS = DELAY_SECONDS * 1000;
@@ -31,14 +29,12 @@ const GET_FOLLOWING_LIMIT = 100;
 const GET_FOLLOWER_LIMIT = 100;
 const GET_POST_LIMIT_LIMIT = 100;
 
-
 /** Max age of a post to be considered */
 const MAX_AGE_HOURS = 2;
 const MAX_AGE = 1000 * 60 * (60 * MAX_AGE_HOURS);
 /** Min age of a post to be considered - to avoid reposting what would could be a hot post */
 const MIN_AGE_HOURS = 0.5;
 const MIN_AGE = 1000 * 60 * (60 * MIN_AGE_HOURS);
-
 
 /** Min likes to be considered */
 const LIKE_MIN = 4;
@@ -49,7 +45,6 @@ const LIKE_WEIGHT = 1;
 /** Allows for giving more weight to a repost */
 const REPOST_WEIGHT = 2;
 //#endregion
-
 
 let following: string[] = [];
 let repostedCids: string[] = [];
@@ -98,7 +93,6 @@ const getFollowing = async (lastCursor?: string) => {
 
 	getFollowing(cursor);
 };
-
 
 let lastSeenDid: string | undefined;
 const followBack = async (lastCursor?: string) => {
@@ -171,7 +165,6 @@ const postIsRecent = (post: FeedViewPost): boolean => {
 	return age < MAX_AGE && age > MIN_AGE;
 };
 
-
 const postMeetsCriteria = (post: FeedViewPost): boolean => {
 	const likeCount = post.post.likeCount ?? 0;
 	const repostCount = post.post.repostCount ?? 0;
@@ -204,7 +197,7 @@ const checkPosts = async (lastCursor?: string) => {
 	let posts = data.feed;
 	let cursor = data.cursor;
 
-	let rootLevel = posts.filter((post) => !post.reply && !post.reason);	
+	let rootLevel = posts.filter((post) => !post.reply && !post.reason);
 	rootLevel = rootLevel.filter((post) => !repostedCids.includes(post.post.cid));
 	let midPosts = rootLevel.filter(postMeetsCriteria);
 
@@ -226,28 +219,14 @@ const checkPosts = async (lastCursor?: string) => {
 	await checkPosts(cursor);
 };
 
-
-let errorCount = 0;
 const run = async () => {
 	console.log('Running...');
-	try {
-		await followBack();
-		writeFollowing();
-		await checkPosts();
-		writeReposted();
-		setTimeout(run, DELAY_MILISECONDS);
-	} catch (e) {
-		console.log('Failed with error: ');
-		console.log(e);
-		errorCount++;
-		if (errorCount > MAX_ERRORS) {
-			console.log('It\'s gone to shit. Exiting.');
-			process.exit(1);
-		}
-		
-	}
+	await followBack();
+	writeFollowing();
+	await checkPosts();
+	writeReposted();
+	setTimeout(run, DELAY_MILISECONDS);
 };
-
 
 const init = async () => {
 	await agent.login({
