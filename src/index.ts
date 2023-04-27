@@ -166,6 +166,14 @@ const postIsRecent = (post: FeedViewPost): boolean => {
 	return age < MAX_AGE && age > MIN_AGE;
 };
 
+const postIsTooOld = (post: FeedViewPost): boolean => {
+	const now = new Date();
+	const { createdAt: createdAtStr } = post.post.record as { text: string; createdAt: string };
+	const createdAt = new Date(createdAtStr);
+	const age = now.getTime() - createdAt.getTime();
+	return age > MAX_AGE;
+}
+
 const postMeetsCriteria = (post: FeedViewPost): boolean => {
 	const likeCount = post.post.likeCount ?? 0;
 	const repostCount = post.post.repostCount ?? 0;
@@ -202,7 +210,6 @@ const checkPosts = async (lastCursor?: string) => {
 	let rootLevel = posts.filter((post) => !post.reply && !post.reason);
 	rootLevel = rootLevel.filter((post) => !repostedCids.includes(post.post.cid));
 	let midPosts = rootLevel.filter(postMeetsCriteria);
-
 	let repostOps: Promise<any>[] = [];
 	for (let i = 0; i < midPosts.length; i++) {
 		const post = midPosts[i];
@@ -218,7 +225,7 @@ const checkPosts = async (lastCursor?: string) => {
 		return;
 	}
 	// If last post is too old, return
-	if (rootLevel.length > 0 && !postIsRecent(rootLevel[rootLevel.length - 1])) {
+	if (rootLevel.length > 0 && postIsTooOld(rootLevel[rootLevel.length - 1])) {
 		return;
 	}
 
