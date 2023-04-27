@@ -213,8 +213,12 @@ const checkPosts = async (lastCursor?: string) => {
 	}
 	await Promise.all(repostOps);
 
+	// If there are no posts for whatever reason, return
+	if (posts.length === 0) {
+		return;
+	}
 	// If last post is too old, return
-	if (!postIsRecent(posts[posts.length - 1])) {
+	if (rootLevel.length > 0 && !postIsRecent(rootLevel[posts.length - 1])) {
 		return;
 	}
 

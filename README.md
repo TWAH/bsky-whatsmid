@@ -31,5 +31,6 @@ BSKY_PASSWORD="YOUR BSKY BOT PASSWORD - USE AN APP PASSWORD"
 
 ## To do
 
-- [ ] Unfollow people who unfollow us :( (don't tell anyone this doesn't work yet)
+- [X] Unfollow people who unfollow us
+- [ ] Minimise api requests.
 - [ ] The rest of the owl 🦉
