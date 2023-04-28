@@ -37,9 +37,9 @@ const MIN_AGE_HOURS = 0.5;
 const MIN_AGE = 1000 * 60 * (60 * MIN_AGE_HOURS);
 
 /** Min likes to be considered */
-const LIKE_MIN = 4;
+const LIKE_MIN = 6;
 /** Max likes to be considered */
-const LIKE_MAX = 7;
+const LIKE_MAX = 11;
 /** Probably not necessary */
 const LIKE_WEIGHT = 1;
 /** Allows for giving more weight to a repost */
