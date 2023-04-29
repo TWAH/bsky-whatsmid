@@ -207,7 +207,7 @@ const checkPosts = async (lastCursor?: string) => {
 	let posts = data.feed;
 	let cursor = data.cursor;
 
-	let rootLevel = posts.filter((post) => !post.reply && !post.reason);
+	let rootLevel = posts.filter((post) => !(post.post.record as any).reply && !post.reason && !post.reply);
 	rootLevel = rootLevel.filter((post) => !repostedCids.includes(post.post.cid));
 	let midPosts = rootLevel.filter(postMeetsCriteria);
 	let repostOps: Promise<any>[] = [];
