@@ -2,11 +2,7 @@
 
 ## WARNING ⚠️
 
-"I wouldn't trust this code as far as I can throw it. If it was hosted on a server, I'd be able to throw it pretty far, but I still wouldn't trust it." - Copilot
-
-Idk, Copilot, are we talking about a 1u server or the whole rack?
-
-Anyway, code might be trash, it might be bullet proof, use it at your own risk etc.
+I wouldn't trust this code as far as I can throw it. Code might be trash, it might be bullet proof, use it at your own risk etc.
 
 ---
 
